@@ -251,6 +251,7 @@ public class Sql {
      * 查询所有订单信息，哪怕它的用户名、商品名缺失，即LEFT JOIN方式
      * @param databaseConnection 连接数据库
      * @throws SQLException 抛出SQL异常
+     * @return 返回所有订单信息
      */
 // 预期的结果为：
 // +----------+-----------+------------+-------------+
