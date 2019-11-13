@@ -85,7 +85,7 @@ public class Sql {
     // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
         PreparedStatement statement = databaseConnection
-                .prepareStatement("select count(*) from `order` where goods_id = ?");
+                .prepareStatement("select count(distinct user_id) from `order` where goods_id = ?");
         statement.setInt(1, goodsId);
         try (ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
