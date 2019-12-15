@@ -88,14 +88,15 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("SELECT  count(distinct USER_ID) from `ORDER` where GOODS_ID=?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("SELECT  count(distinct USER_ID) from \"ORDER\" where GOODS_ID=?")) {
             statement.setInt(1, goodsId);
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 return resultSet.getInt(1);
             }
-        }return -1;
+        }
+        return -1;
     }
 
     /**
@@ -114,8 +115,8 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select id,name,TEL,ADDRESS from USER order by ID desc limit ?,?;")) {
-            statement.setInt(1, (pageNum-1)*3);
-            statement.setInt(2, pageSize);
+            statement.setInt(1, pageSize);
+            statement.setInt(2, pageNum);
 
             List<User> users=new ArrayList<>();
             ResultSet resultSet = statement.executeQuery();
