@@ -81,6 +81,12 @@ public class Sql {
 // +-----+
 // | 2   |
 // +-----+
+    /**
+     *
+     * @param databaseConnection
+     * @return
+     * @throws SQLException
+     */
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select count(*) as num from `ORDER` where goodsId = ?")) {
             statement.setInt(1, goodsId);
@@ -108,6 +114,12 @@ public class Sql {
 // +----+----------+------+----------+
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
+    /**
+     *
+     * @param databaseConnection
+     * @return
+     * @throws SQLException
+     */
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         List<User> userList = new ArrayList<>();
         try (PreparedStatement statement =
@@ -157,6 +169,12 @@ public class Sql {
 //  +----+--------+------+
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
+    /**
+     *
+     * @param databaseConnection
+     * @return
+     * @throws SQLException
+     */
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
 
         List<GoodsAndGmv> goodsAndGmvs = new ArrayList<>();
@@ -214,6 +232,12 @@ public class Sql {
 // +----------+-----------+------------+-------------+
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
+    /**
+     *
+     * @param databaseConnection
+     * @return
+     * @throws SQLException
+     */
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.ID, u.NAME as USER_NAME, g.NAME as GOOD_NAME, o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE " +
@@ -258,6 +282,13 @@ public class Sql {
 // +----------+-----------+------------+-------------+
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
+
+    /**
+     *
+     * @param databaseConnection
+     * @return
+     * @throws SQLException
+     */
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.ID, u.NAME as USER_NAME, g.NAME as GOOD_NAME, o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE " +
