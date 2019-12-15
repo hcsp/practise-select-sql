@@ -82,16 +82,16 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        PreparedStatement statement = databaseConnection.prepareStatement("select count(*) as num from `ORDER` where goodsId = ?");
-        statement.setInt(1, goodsId);
-        ResultSet resultSet = statement.executeQuery();
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(*) as num from `ORDER` where goodsId = ?")) {
+            statement.setInt(1, goodsId);
+            ResultSet resultSet = statement.executeQuery();
 
-        int num = 0;
-
-        while (resultSet.next()) {
-            num = resultSet.getInt("num");
+            if (resultSet.next()) {
+                return resultSet.getInt("num");
+            }
+            return 0;
         }
-        return num;
+
     }
 
     /**
@@ -110,19 +110,23 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         List<User> userList = new ArrayList<>();
-        PreparedStatement statement = databaseConnection.prepareStatement("select *  from USER order by id desc limit ?, ?");
-        statement.setInt(1, (pageNum - 1) * pageSize);
-        statement.setInt(2, pageSize);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            User user = new User();
-            user.id = resultSet.getInt("ID");
-            user.name = resultSet.getString("NAME");
-            user.tel = resultSet.getString("TEL");
-            user.address = resultSet.getString("ADDRESS");
-            userList.add(user);
+        try (PreparedStatement statement =
+                     databaseConnection.prepareStatement("select *  from USER order by id desc limit ?, ?")) {
+            statement.setInt(1, (pageNum - 1) * pageSize);
+            statement.setInt(2, pageSize);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    User user = new User();
+                    user.id = resultSet.getInt("ID");
+                    user.name = resultSet.getString("NAME");
+                    user.tel = resultSet.getString("TEL");
+                    user.address = resultSet.getString("ADDRESS");
+                    userList.add(user);
+                }
+                return userList;
+            }
         }
-        return userList;
+
     }
 
     // 商品及其营收
@@ -161,16 +165,19 @@ public class Sql {
                 "left join `ORDER` o on g.id = o.GOODS_ID " +
                 "group by g.id order by sum(o.GOODS_NUM) * o.GOODS_PRICE desc ";
 
-        PreparedStatement statement = databaseConnection.prepareStatement(sql);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
-            goodsAndGmv.goodsId = resultSet.getInt("ID");
-            goodsAndGmv.goodsName = resultSet.getString("NAME");
-            goodsAndGmv.gmv = resultSet.getBigDecimal("GMV");
-            goodsAndGmvs.add(goodsAndGmv);
+        try (PreparedStatement statement = databaseConnection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
+                goodsAndGmv.goodsId = resultSet.getInt("ID");
+                goodsAndGmv.goodsName = resultSet.getString("NAME");
+                goodsAndGmv.gmv = resultSet.getBigDecimal("GMV");
+                goodsAndGmvs.add(goodsAndGmv);
+            }
+            return goodsAndGmvs;
         }
-        return goodsAndGmvs;
+
     }
 
 
@@ -213,17 +220,18 @@ public class Sql {
                 "from `ORDER` o " +
                 "inner join USER u on o.USER_ID = u.ID" +
                 "inner join GOODS g on o.GOOEDs_ID = g.ID";
-        PreparedStatement statement = databaseConnection.prepareStatement(sql);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            Order order = new Order();
-            order.id = resultSet.getInt("ID");
-            order.userName = resultSet.getString("USER_NAME");
-            order.goodsName = resultSet.getString("GOODS_NAME");
-            order.totalPrice = resultSet.getBigDecimal("TOTAL_PRICE");
-            orders.add(order);
+        try (PreparedStatement statement = databaseConnection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Order order = new Order();
+                order.id = resultSet.getInt("ID");
+                order.userName = resultSet.getString("USER_NAME");
+                order.goodsName = resultSet.getString("GOODS_NAME");
+                order.totalPrice = resultSet.getBigDecimal("TOTAL_PRICE");
+                orders.add(order);
+            }
+            return orders;
         }
-        return orders;
     }
 
     /**
@@ -256,17 +264,18 @@ public class Sql {
                 "from `ORDER` o " +
                 "left join USER u on o.USER_ID = u.ID" +
                 "left join GOODS g on o.GOOEDs_ID = g.ID";
-        PreparedStatement statement = databaseConnection.prepareStatement(sql);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            Order order = new Order();
-            order.id = resultSet.getInt("ID");
-            order.userName = resultSet.getString("USER_NAME");
-            order.goodsName = resultSet.getString("GOODS_NAME");
-            order.totalPrice = resultSet.getBigDecimal("TOTAL_PRICE");
-            orders.add(order);
+        try (PreparedStatement statement = databaseConnection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Order order = new Order();
+                order.id = resultSet.getInt("ID");
+                order.userName = resultSet.getString("USER_NAME");
+                order.goodsName = resultSet.getString("GOODS_NAME");
+                order.totalPrice = resultSet.getBigDecimal("TOTAL_PRICE");
+                orders.add(order);
+            }
+            return orders;
         }
-        return orders;
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
