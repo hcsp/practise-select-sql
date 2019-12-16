@@ -31,11 +31,11 @@ public class Sql {
     }
 
     /**
-     * 题目1：
-     * 查询有多少所有用户曾经买过指定的商品
-     *
+     *ggggggg
+     * @param databaseConnection 数据库连接
      * @param goodsId 指定的商品ID
      * @return 有多少用户买过这个商品
+     * @throws SQLException 数据库连接异常
      */
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("SELECT  count(distinct USER_ID) from \"ORDER\" where GOODS_ID=?")) {
@@ -50,12 +50,12 @@ public class Sql {
     }
 
     /**
-     * 题目2：
-     * 分页查询所有用户，按照ID倒序排列
      *
-     * @param pageNum 第几页，从1开始
+     * @param databaseConnection 数据库连接
+     * @param pageNum 取第几页
      * @param pageSize 每页有多少个元素
      * @return 指定页中的用户
+     * @throws SQLException 数据库连接异常
      */
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select id,name,TEL,ADDRESS from USER order by ID desc limit ?,?;")) {
@@ -92,8 +92,10 @@ public class Sql {
     }
 
     /**
-     * 题目3：
-     * 查询所有的商品及其销售额，按照销售额从大到小排序
+     *
+     * @param databaseConnection 数据库连接
+     * @return 查询所有的商品及其销售额，按照销售额从大到小排序
+     * @throws SQLException 数据库连接异常
      */
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID,GOODS.NAME,SUM(\"ORDER\".GOODS_NUM*\"ORDER\".GOODS_PRICE) as GMV\n" +
@@ -134,8 +136,10 @@ public class Sql {
     }
 
     /**
-     * 题目4：
-     * 查询订单信息，只查询用户名、商品名齐全的订单，即INNER JOIN方式
+     *
+     * @param databaseConnection 数据库连接
+     * @return 查询订单信息，只查询用户名、商品名齐全的订单，即INNER JOIN方式
+     * @throws SQLException 数据库连接异常
      */
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID,\n" +
@@ -159,8 +163,10 @@ public class Sql {
     }
 
     /**
-     * 题目5：
-     * 查询所有订单信息，哪怕它的用户名、商品名缺失，即LEFT JOIN方式
+     *
+     * @param databaseConnection 数据库连接
+     * @return 查询所有订单信息，哪怕它的用户名、商品名缺失，即LEFT JOIN方式
+     * @throws SQLException 数据库连接异常
      */
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID,\n" +
