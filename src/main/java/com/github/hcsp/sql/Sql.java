@@ -81,9 +81,11 @@ public class Sql {
 // +-----+
 // | 2   |
 // +-----+
+
     /**
      *
      * @param databaseConnection
+     * @param goodsId
      * @return
      * @throws SQLException
      */
@@ -114,9 +116,12 @@ public class Sql {
 // +----+----------+------+----------+
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
+
     /**
      *
      * @param databaseConnection
+     * @param pageNum
+     * @param pageSize
      * @return
      * @throws SQLException
      */
