@@ -90,7 +90,7 @@ public class Sql {
      * @throws SQLException 数据库错误
      */
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(*) as num from `ORDER` where goodsId = ?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(*) as num from `ORDER` where GOODS_ID = ?")) {
             statement.setInt(1, goodsId);
             ResultSet resultSet = statement.executeQuery();
 
@@ -249,7 +249,7 @@ public class Sql {
         String sql = "SELECT o.ID, u.NAME as USER_NAME, g.NAME as GOOD_NAME, o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE " +
                 "from `ORDER` o " +
                 "inner join USER u on o.USER_ID = u.ID " +
-                "inner join GOODS g on o.GOOED_ID = g.ID";
+                "inner join GOODS g on o.GOODS_ID = g.ID";
         return getOrders(databaseConnection, (List<Order>) orders, sql);
     }
 
@@ -312,7 +312,7 @@ public class Sql {
         String sql = "SELECT o.ID, u.NAME as USER_NAME, g.NAME as GOOD_NAME, o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE " +
                 "from `ORDER` o " +
                 "left join USER u on o.USER_ID = u.ID " +
-                "left join GOODS g on o.GOOEDs_ID = g.ID";
+                "left join GOODS g on o.GOODS_ID = g.ID";
         return getOrders(databaseConnection, (List<Order>) orders, sql);
     }
 
