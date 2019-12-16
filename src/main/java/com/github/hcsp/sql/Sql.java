@@ -84,10 +84,10 @@ public class Sql {
 
     /**
      *
-     * @param databaseConnection
-     * @param goodsId
-     * @return
-     * @throws SQLException
+     * @param databaseConnection 数据源
+     * @param goodsId 商品id
+     * @return 返回多少所有用户曾经买过指定的商品
+     * @throws SQLException 数据库错误
      */
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select count(*) as num from `ORDER` where goodsId = ?")) {
@@ -119,11 +119,11 @@ public class Sql {
 
     /**
      *
-     * @param databaseConnection
-     * @param pageNum
-     * @param pageSize
-     * @return
-     * @throws SQLException
+     * @param databaseConnection 数据源
+     * @param pageNum 第几页，从1开始
+     * @param pageSize 每页有多少个元素
+     * @return 返回用户列表
+     * @throws SQLException 数据库错误
      */
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
 
@@ -177,9 +177,9 @@ public class Sql {
 //  +----+--------+------+
     /**
      *
-     * @param databaseConnection
-     * @return
-     * @throws SQLException
+     * @param databaseConnection 数据源
+     * @return 所有的商品及其销售额，按照销售额从大到小排序
+     * @throws SQLException 数据库操作错误
      */
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
 
@@ -240,9 +240,9 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     /**
      *
-     * @param databaseConnection
-     * @return
-     * @throws SQLException
+     * @param databaseConnection 数据源
+     * @return 返回订单信息，只查询用户名、商品名齐全的订单
+     * @throws SQLException 数据库错误
      */
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -250,6 +250,18 @@ public class Sql {
                 "from `ORDER` o " +
                 "inner join USER u on o.USER_ID = u.ID" +
                 "inner join GOODS g on o.GOOEDs_ID = g.ID";
+        return getOrders(databaseConnection, (List<Order>) orders, sql);
+    }
+
+    /**
+     *
+     * @param databaseConnection 数据源
+     * @param orders 订单信息
+     * @param sql sql数据
+     * @return 返回订单信息列表
+     * @throws SQLException 数据库错误
+     */
+    private static List<Order> getOrders(Connection databaseConnection, List<Order> orders, String sql) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -291,9 +303,9 @@ public class Sql {
 
     /**
      *
-     * @param databaseConnection
-     * @return
-     * @throws SQLException
+     * @param databaseConnection 数据源
+     * @return 返回 所有订单信息，哪怕它的用户名、商品名缺失
+     * @throws SQLException 数据库错误
      */
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -301,18 +313,7 @@ public class Sql {
                 "from `ORDER` o " +
                 "left join USER u on o.USER_ID = u.ID" +
                 "left join GOODS g on o.GOOEDs_ID = g.ID";
-        try (PreparedStatement statement = databaseConnection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                Order order = new Order();
-                order.id = resultSet.getInt("ID");
-                order.userName = resultSet.getString("USER_NAME");
-                order.goodsName = resultSet.getString("GOODS_NAME");
-                order.totalPrice = resultSet.getBigDecimal("TOTAL_PRICE");
-                orders.add(order);
-            }
-            return orders;
-        }
+        return getOrders(databaseConnection, (List<Order>) orders, sql);
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
