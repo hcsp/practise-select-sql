@@ -248,8 +248,8 @@ public class Sql {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.ID, u.NAME as USER_NAME, g.NAME as GOOD_NAME, o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE " +
                 "from `ORDER` o " +
-                "inner join USER u on o.USER_ID = u.ID" +
-                "inner join GOODS g on o.GOOEDs_ID = g.ID";
+                "inner join USER u on o.USER_ID = u.ID " +
+                "inner join GOODS g on o.GOOED_ID = g.ID";
         return getOrders(databaseConnection, (List<Order>) orders, sql);
     }
 
@@ -258,8 +258,8 @@ public class Sql {
      * @param databaseConnection 数据源
      * @param orders 订单信息
      * @param sql sql数据
-     * @return 返回订单信息列表
-     * @throws SQLException 数据库错误
+     * @return 返回订单信息
+     * @throws SQLException
      */
     private static List<Order> getOrders(Connection databaseConnection, List<Order> orders, String sql) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement(sql);
@@ -311,7 +311,7 @@ public class Sql {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.ID, u.NAME as USER_NAME, g.NAME as GOOD_NAME, o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE " +
                 "from `ORDER` o " +
-                "left join USER u on o.USER_ID = u.ID" +
+                "left join USER u on o.USER_ID = u.ID " +
                 "left join GOODS g on o.GOOEDs_ID = g.ID";
         return getOrders(databaseConnection, (List<Order>) orders, sql);
     }
