@@ -202,6 +202,33 @@ public class Sql {
     }
 
     /**
+     * 习题3和习题4抽取的公用方法
+     * 查询所有的商品及其销售额，按照销售额从大到小排序
+     *
+     * @param databaseConnection jdbc连接对象
+     * @param whichJoin          何种方式join两张表
+     * @return 符合需求的商品销售额列表
+     */
+    public static List<Order> getJoinOrders(Connection databaseConnection, String whichJoin) throws SQLException {
+        List<Order> result = new ArrayList<>();
+        String sql = "select `ORDER`.ID                as ORDER_ID,\n" +
+                "       USER.NAME                 as USER_NAME,\n" +
+                "       GOODS.NAME                as GOODS_NAME,\n" +
+                "       (GOODS_NUM * GOODS_PRICE) as TOTAL_PRICE\n" +
+                "from `ORDER`\n" +
+                whichJoin + " join GOODS on `ORDER`.GOODS_ID = GOODS.ID\n" +
+                whichJoin + " join USER on `ORDER`.USER_ID = USER.ID\n" +
+                "group by ORDER_ID";
+        try (PreparedStatement statement = databaseConnection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                result.add(new Order(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getBigDecimal(4)));
+            }
+        }
+        return result;
+    }
+
+    /**
      * 题目4：
      * 查询订单信息，只查询用户名、商品名齐全的订单，即INNER JOIN方式
      *
@@ -225,21 +252,7 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        List<Order> result = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select `ORDER`.ID                as ORDER_ID,\n" +
-                "       USER.NAME                 as USER_NAME,\n" +
-                "       GOODS.NAME                as GOODS_NAME,\n" +
-                "       (GOODS_NUM * GOODS_PRICE) as TOTAL_PRICE\n" +
-                "from `ORDER`\n" +
-                "         join GOODS on `ORDER`.GOODS_ID = GOODS.ID\n" +
-                "         join USER on `ORDER`.USER_ID = USER.ID\n" +
-                "group by ORDER_ID\n")) {
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                result.add(new Order(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getBigDecimal(4)));
-            }
-        }
-        return result;
+        return getJoinOrders(databaseConnection, "inner");
     }
 
     /**
@@ -270,21 +283,7 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        List<Order> result = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select `ORDER`.ID                as ORDER_ID,\n" +
-                "       USER.NAME                 as USER_NAME,\n" +
-                "       GOODS.NAME                as GOODS_NAME,\n" +
-                "       (GOODS_NUM * GOODS_PRICE) as TOTAL_PRICE\n" +
-                "from `ORDER`\n" +
-                "        left join GOODS on `ORDER`.GOODS_ID = GOODS.ID\n" +
-                "        left join USER on `ORDER`.USER_ID = USER.ID\n" +
-                "group by ORDER_ID")) {
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                result.add(new Order(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getBigDecimal(4)));
-            }
-        }
-        return result;
+        return getJoinOrders(databaseConnection, "left");
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
@@ -292,10 +291,10 @@ public class Sql {
         File projectDir = new File(System.getProperty("basedir", System.getProperty("user.dir")));
         String jdbcUrl = "jdbc:h2:file:" + new File(projectDir, "target/test").getAbsolutePath();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "root", "Jxi1Oxc92qSj")) {
-            System.out.println(countUsersWhoHaveBoughtGoods(connection, 1));
+            //  System.out.println(countUsersWhoHaveBoughtGoods(connection, 1));
             //System.out.println(getUsersByPageOrderedByIdDesc(connection, 2, 3));
             // System.out.println(getGoodsAndGmv(connection));
-            //System.out.println(getInnerJoinOrders(connection));
+            System.out.println(getInnerJoinOrders(connection));
             //System.out.println(getLeftJoinOrders(connection));
         }
     }
