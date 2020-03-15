@@ -1,11 +1,12 @@
 
 package com.github.hcsp.sql;
+
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class Sql {
 // 用户表：
@@ -82,14 +83,21 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        return 0;
+        PreparedStatement preparedStatement = databaseConnection.prepareStatement("select GOODS_ID,count(*) from (select distinct USER_ID,GOODS_ID from `ORDER` where GOODS_ID=?)");
+        preparedStatement.setInt(1, goodsId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.next();
+        int anInt = resultSet.getInt(2);
+        preparedStatement.close();
+        resultSet.close();
+        return anInt;
     }
 
     /**
      * 题目2：
      * 分页查询所有用户，按照ID倒序排列
      *
-     * @param pageNum 第几页，从1开始
+     * @param pageNum  第几页，从1开始
      * @param pageSize 每页有多少个元素
      * @return 指定页中的用户
      */
@@ -132,7 +140,23 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        return null;
+        PreparedStatement preparedStatement = databaseConnection.prepareStatement("select GOODS_ID,TOTAL,GOODS.NAME FROM (select GOODS_ID,SUM(GOODS_ID*GOODS_PRICE) as TOTAL from `ORDER` GROUP BY GOODS_ID ORDER BY TOTAL DESC) join GOODS ON `ORDER`.GOODS_ID = GOODS.id ");
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        List<GoodsAndGmv> list = new ArrayList<>();
+        int i = 0;
+        while (resultSet.next()) {
+            list.add(new GoodsAndGmv());
+            list.get(i).goodsId = resultSet.getInt("id");
+            list.get(i).goodsName = resultSet.getString("name");
+            list.get(i).gmv = resultSet.getBigDecimal("GMV");
+            i++;
+        }
+
+        preparedStatement.close();
+        resultSet.close();
+        return list;
+
     }
 
 
@@ -198,19 +222,35 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            databaseConnection.prepareStatement("select \"ORDER\".id, \"ORDER\".USER_ID, \"ORDER\".GOODS_ID, GOODS.NAME, user.NAME, user.TEL, user.ADDRESS\n" +
+                    "from \"ORDER\"\n" +
+                    "       join GOODS\n" +
+                    "            on \"ORDER\".GOODS_ID = GOODS.ID\n" +
+                    "       join USER\n" +
+                    "            on \"ORDER\".USER_ID = user.ID");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
         return null;
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
+
     public static void main(String[] args) throws SQLException {
         File projectDir = new File(System.getProperty("basedir", System.getProperty("user.dir")));
         String jdbcUrl = "jdbc:h2:file:" + new File(projectDir, "target/test").getAbsolutePath();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "root", "Jxi1Oxc92qSj")) {
             System.out.println(countUsersWhoHaveBoughtGoods(connection, 1));
-            System.out.println(getUsersByPageOrderedByIdDesc(connection, 2, 3));
+            //System.out.println(getUsersByPageOrderedByIdDesc(connection, 2, 3));
             System.out.println(getGoodsAndGmv(connection));
-            System.out.println(getInnerJoinOrders(connection));
-            System.out.println(getLeftJoinOrders(connection));
+            //System.out.println(getInnerJoinOrders(connection));
+            // System.out.println(getLeftJoinOrders(connection));
         }
     }
 
