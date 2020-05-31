@@ -84,7 +84,7 @@ public class Sql {
         String sql = "select count(distinct user_id) from \"ORDER\" where goods_id = ? ;";
         try(PreparedStatement preparedStatement = databaseConnection.prepareStatement(sql)) {
             preparedStatement.setInt(1, goodsId);
-            ResultSet resultSet = ((PreparedStatement) preparedStatement).executeQuery();
+            ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             } else {
