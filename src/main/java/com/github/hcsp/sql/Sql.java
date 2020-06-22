@@ -86,7 +86,8 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(distinct user_id) from `order` where goods_id = ?")) {
+        String sql = "select count(distinct USER_ID) from `order` where GOODS_ID = ?";
+        try (PreparedStatement statement = databaseConnection.prepareStatement(sql)) {
             statement.setInt(1, goodsId);
             ResultSet resultSet = statement.executeQuery();
 
@@ -112,7 +113,7 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from user order by id desc limit (? - 1) * ?, ?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from `user` order by id desc limit (? - 1) * ?, ?")) {
             statement.setInt(1, pageNum);
             statement.setInt(2, pageSize);
             statement.setInt(3, pageSize);
@@ -155,7 +156,7 @@ public class Sql {
 //  | 1  | goods1 | 80   |
 //  +----+--------+------+
 //  | 4  | goods4 | 20   |
-//  +----+--------+-----
+//  +----+--------+------+
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
