@@ -112,7 +112,7 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from user limit (? - 1) * ?, ?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from user order by id desc limit (? - 1) * ?, ?")) {
             statement.setInt(1, pageNum);
             statement.setInt(2, pageSize);
             statement.setInt(3, pageSize);
