@@ -3,7 +3,11 @@ package com.github.hcsp.sql;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,10 +159,10 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select goods.id,goods.name,sum(goods_num*goods_price) as totle from `order`\n" +
-                "join goods \n" +
-                "on goods.id=`order`.goods_id\n" +
-                "group by goods.id order by totle desc")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select goods.id,goods.name,sum(goods_num*goods_price) as totle from `order`\n"
+                + "join goods \n"
+                + "on goods.id=`order`.goods_id\n"
+                + "group by goods.id order by totle desc")) {
             ResultSet resultSet = statement.executeQuery();
             List<GoodsAndGmv> goodsAndGmvs = new ArrayList<>();
             while (resultSet.next()) {
@@ -207,12 +211,12 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select `order`.id,user.name as user_name,goods.name as goods_name,sum(goods_num*goods_price) as total_price from `order`\n" +
-                " join goods\n" +
-                "on goods.id = `order`.goods_id\n" +
-                " join user\n" +
-                "on user.id = `order`.user_id\n" +
-                "group by `order`.id")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select `order`.id,user.name as user_name,goods.name as goods_name,sum(goods_num*goods_price) as total_price from `order`\n"
+                + " join goods\n"
+                + "on goods.id = `order`.goods_id\n"
+                + " join user\n"
+                + "on user.id = `order`.user_id\n"
+                + "group by `order`.id")) {
             ResultSet resultSet = statement.executeQuery();
             List<Order> orders = new ArrayList<>();
             while (resultSet.next()) {
@@ -252,12 +256,12 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select `order`.id,user.name as user_name,goods.name as goods_name,sum(goods_num*goods_price) as total_price from `order`\n" +
-                "left join goods\n" +
-                "on goods.id = `order`.goods_id\n" +
-                "left join user\n" +
-                "on user.id = `order`.user_id\n" +
-                "group by `order`.id")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select `order`.id,user.name as user_name,goods.name as goods_name,sum(goods_num*goods_price) as total_price from `order`\n"
+                + "left join goods\n"
+                + "on goods.id = `order`.goods_id\n"
+                + "left join user\n"
+                + "on user.id = `order`.user_id\n"
+                + "group by `order`.id")) {
             ResultSet resultSet = statement.executeQuery();
             List<Order> orders = new ArrayList<>();
             while (resultSet.next()) {
