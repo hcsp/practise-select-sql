@@ -156,8 +156,25 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        return null;
-    }
+        String sql = "select GOODS_ID, GOODS.NAME, sum(GOODS_NUM * GOODS_PRICE) as GMV\n" +
+                "from `ORDER`\n" +
+                "         join GOODS ON `ORDER`.GOODS_ID = GOODS.ID\n" +
+                "group by GOODS_ID\n" +
+                "order by GMV desc";
+        List<GoodsAndGmv> list = new ArrayList<>();
+        try (PreparedStatement statement = databaseConnection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
+                goodsAndGmv.goodsId = resultSet.getInt(1);
+                goodsAndGmv.goodsName = resultSet.getString(2);
+                goodsAndGmv.gmv = resultSet.getBigDecimal(3);
+                list.add(goodsAndGmv);
+            }
+        }
+        return list;
+    }	    }
+
 
 
     // 订单详细信息
@@ -194,7 +211,13 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+        String sql = "select `ORDER`.ID, USER.NAME, GOODS.NAME, sum(GOODS_NUM * GOODS_PRICE) as TOTAL_PRICE\n" +
+                "from `ORDER`\n" +
+                "         join GOODS on `ORDER`.GOODS_ID = GOODS.ID\n" +
+                "         join USER on `ORDER`.USER_ID = USER.ID\n" +
+                "group by \"ORDER\".ID";
+        return order2List(databaseConnection, sql);
+
     }
 
     /**
@@ -222,24 +245,13 @@ public class Sql {
 // +----------+-----------+------------+-------------+
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
-    public static List<GoodsAndGmv> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        String sql = "select GOODS_ID, GOODS.NAME, sum(GOODS_NUM * GOODS_PRICE) as GMV\n" +
+    public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
+        String sql = "select `ORDER`.ID, USER.NAME, GOODS.NAME, sum(GOODS_NUM * GOODS_PRICE) as TOTAL_PRICE\n" +
                 "from `ORDER`\n" +
-                "         join GOODS ON `ORDER`.GOODS_ID = GOODS.ID\n" +
-                "group by GOODS_ID\n" +
-                "order by GMV desc";
-        List<GoodsAndGmv> list = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement(sql)) {
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
-                goodsAndGmv.goodsId = resultSet.getInt(1);
-                goodsAndGmv.goodsName = resultSet.getString(2);
-                goodsAndGmv.gmv = resultSet.getBigDecimal(3);
-                list.add(goodsAndGmv);
-            }
-        }
-        return list;
+                "         left join GOODS on `ORDER`.GOODS_ID = GOODS.ID\n" +
+                "         left join USER on `ORDER`.USER_ID = USER.ID\n" +
+                "group by \"ORDER\".ID";
+        return order2List(databaseConnection, sql);
     }
 
 
@@ -248,12 +260,27 @@ public class Sql {
         File projectDir = new File(System.getProperty("basedir", System.getProperty("user.dir")));
         String jdbcUrl = "jdbc:h2:file:" + new File(projectDir, "target/test").getAbsolutePath();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "root", "Jxi1Oxc92qSj")) {
-            System.out.println(countUsersWhoHaveBoughtGoods(connection, 1));
-            System.out.println(getUsersByPageOrderedByIdDesc(connection, 2, 3));
-            System.out.println(getGoodsAndGmv(connection));
+            System.out.println(Sql.countUsersWhoHaveBoughtGoods(connection, 1));
+            System.out.println(Sql.getUsersByPageOrderedByIdDesc(connection, 2, 3));
+            System.out.println(Sql.getGoodsAndGmv(connection));
             System.out.println(getInnerJoinOrders(connection));
             System.out.println(getLeftJoinOrders(connection));
         }
     }
+        public static List<Order> order2List(Connection databaseConnection, String sql) throws SQLException {
+            List<Order> list = new ArrayList<>();
+            try (PreparedStatement statement = databaseConnection.prepareStatement(sql)) {
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    Order order = new Order();
+                    order.id = resultSet.getInt(1);
+                    order.userName = resultSet.getString(2);
+                    order.goodsName = resultSet.getString(3);
+                    order.totalPrice = resultSet.getBigDecimal(4);
+                    list.add(order);
+                }
+            }
+            return list;
+        }
+    }
 
-}
