@@ -150,6 +150,7 @@ public class Sql {
          * 题目3：
          * 查询所有的商品及其销售额，按照销售额从大到小排序
          *  @param databaseConnection
+         *  @return tag
          */
 // 预期的结果应该如图所示
 //  +----+--------+------+
@@ -202,6 +203,7 @@ public class Sql {
          * 题目4：
          * 查询订单信息，只查询用户名、商品名齐全的订单，即INNER JOIN方式
          *  @param databaseConnection
+         * @return tag
          */
 // 预期的结果为：
 // +----------+-----------+------------+-------------+
@@ -245,7 +247,7 @@ public class Sql {
             /**
              * 题目5：
              * 查询所有订单信息，哪怕它的用户名、商品名缺失，即LEFT JOIN方式
-             * @return
+             * @return tag
              *  @param databaseConnection
              */
 // 预期的结果为：
