@@ -3,7 +3,11 @@ package com.github.hcsp.sql;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,16 +86,15 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select count(distinct USER_ID) from \"ORDER\" where goods_id = ?")) {
-            preparedStatement.setInt(1, goodsId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt(1);
-                }
-            }
-        }
+        try (PreparedStatement statemnet = databaseConnection.prepareStatement("select count(distinct USER_ID) from \"ORDER\" where GOODS_ID= ? ")) {
+            statemnet.setInt(1, goodsId);
+            ResultSet resultSet = statemnet.executeQuery();
 
-        return 0;
+            while (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+            return -1;
+        }
     }
 
     /**
