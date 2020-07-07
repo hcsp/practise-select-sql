@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sql {
+    private static Connection databaseConnection;
 // 用户表：
 // +----+----------+------+----------+
 // | ID | NAME     | TEL  | ADDRESS  |
