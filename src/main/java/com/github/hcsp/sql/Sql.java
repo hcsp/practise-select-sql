@@ -74,7 +74,7 @@ public class Sql {
      *
      * @param databaseConnection 数据库连接
      * @param goodsId            指定的商品ID
-     * @return 有多少用户买过这个商品         * @return 有多少用户买过这个商品
+     * @return 有多少用户买过这个商品
      */
 // 例如，输入goodsId = 1，返回2，因为有2个用户曾经买过商品1。
 // +-----+
@@ -99,9 +99,9 @@ public class Sql {
      * 分页查询所有用户，按照ID倒序排列
      *
      * @param databaseConnection 数据库连接
-     * @param pageSize           每页有多少个元素	     * @param pageNum            第几页，从1开始
      * @param pageSize           每页有多少个元素
-     * @return 指定页中的用户         * @return 指定页中的用户
+     * @param pageNum            第几页，从1开始
+     * @return 指定页中的用户
      */
 // 例如，pageNum = 2, pageSize = 3（每页3个元素，取第二页），则应该返回：
 // +----+----------+------+----------+
