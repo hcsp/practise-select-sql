@@ -153,6 +153,7 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
+
         List<GoodsAndGmv> list = new ArrayList<>();
         try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".GOODS_ID, GOODS.NAME, cast(sum(\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as bigint) as GMV\n" +
                 "from \"ORDER\"\n" +
@@ -207,6 +208,7 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
+
         List<Order> list = new ArrayList<>();
         try (PreparedStatement statement = databaseConnection.prepareStatement("select `ORDER`.ID, USER.NAME, GOODS.NAME, cast(`ORDER`.GOODS_NUM * `ORDER`.GOODS_PRICE as decimal) as TOTAL_PRICE\n" +
                 "from `ORDER`\n" +
@@ -253,6 +255,7 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
+
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id,USER.NAME,GOODS.NAME,cast(\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE as decimal ) as TOTAL_PRICE\n" +
                 "from \"ORDER\"\n" +
