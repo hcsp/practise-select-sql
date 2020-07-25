@@ -114,9 +114,10 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         List<User> list = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from user order by user.ID desc limit ?,?;")) {
-            statement.setInt(1, pageNum);
-            statement.setInt(2, pageSize);
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from user order by user.ID desc limit ? * (? - 1),?;")) {
+            statement.setInt(1, pageSize);
+            statement.setInt(2, pageNum);
+            statement.setInt(3, pageSize);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 User user = new User();
