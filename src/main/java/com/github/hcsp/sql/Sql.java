@@ -87,7 +87,8 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select cpunt(distinct user_id) as count" +
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select " +
+                "count(distinct user_id) as count" +
                 "from 'order' o where o.goods_id = ?")) {
             statement.setInt(1, goodsId);
 
