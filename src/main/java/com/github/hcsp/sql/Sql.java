@@ -89,7 +89,7 @@ public class Sql {
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select " +
                 "count(distinct user_id) as count" +
-                "from 'order' o where o.goods_id = ?")) {
+                " from 'order' o where o.goods_id = ?")) {
             statement.setInt(1, goodsId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -271,11 +271,11 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         try (PreparedStatement statement = databaseConnection.prepareStatement("select o.id as order_id,u.name as user_name,g.name as goods_name,(goods_num * goods_price) as total_price\n" +
-                "from 'order' o\n" +
-                "left join user u \n" +
-                "on o.user_id = u.id\n" +
-                "left join goods g\n" +
-                "on o.goods_id = g.id")) {
+                " from 'order' o\n" +
+                " left join user u \n" +
+                " on o.user_id = u.id\n" +
+                " left join goods g\n" +
+                " on o.goods_id = g.id")) {
             ResultSet resultSet = statement.executeQuery();
             List<Order> list = new ArrayList<>();
             while (resultSet.next()) {
