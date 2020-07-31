@@ -244,7 +244,8 @@ public class Sql {
     }
 
     /**
-     * 题目5：
+     * @param databaseConnection
+     * @return 题目5：
      * 查询所有订单信息，哪怕它的用户名、商品名缺失，即LEFT JOIN方式
      */
 // 预期的结果为：
