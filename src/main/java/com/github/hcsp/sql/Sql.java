@@ -87,9 +87,9 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select " +
-                "count(distinct user_id) as count" +
-                " from 'order' o where o.goods_id = ?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(distinct USER_ID) USER_ID\n" +
+                "from \"ORDER\"\n" +
+                "where GOODS_ID = ?;")) {
             statement.setInt(1, goodsId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -270,12 +270,15 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select o.id as order_id,u.name as user_name,g.name as goods_name,(goods_num * goods_price) as total_price\n" +
-                " from 'order' o\n" +
-                " left join user u \n" +
-                " on o.user_id = u.id\n" +
-                " left join goods g\n" +
-                " on o.goods_id = g.id")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID              as order_id,\n" +
+                "       user.NAME               as user_name,\n" +
+                "       goods.NAME              as goods_name,\n" +
+                "       GOODS_PRICE * GOODS_NUM as total_price\n" +
+                "from \"ORDER\"\n" +
+                "         left join USER\n" +
+                "              on user.ID = \"ORDER\".USER_ID\n" +
+                "         left join GOODS\n" +
+                "              on goods.ID = \"ORDER\".GOODS_ID;\n")) {
             ResultSet resultSet = statement.executeQuery();
             List<Order> list = new ArrayList<>();
             while (resultSet.next()) {
