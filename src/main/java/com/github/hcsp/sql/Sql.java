@@ -3,9 +3,13 @@ package com.github.hcsp.sql;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.DriverManager;
 
 public class Sql {
 // 用户表：
@@ -73,6 +77,7 @@ public class Sql {
      * 查询有多少所有用户曾经买过指定的商品
      *
      * @param goodsId 指定的商品ID
+     * @param databaseConnection
      * @return 有多少用户买过这个商品
      */
 // 例如，输入goodsId = 1，返回2，因为有2个用户曾经买过商品1。
@@ -100,6 +105,7 @@ public class Sql {
      *
      * @param pageNum  第几页，从1开始
      * @param pageSize 每页有多少个元素
+     * @param databaseConnection
      * @return 指定页中的用户
      */
 // 例如，pageNum = 2, pageSize = 3（每页3个元素，取第二页），则应该返回：
@@ -143,7 +149,8 @@ public class Sql {
     }
 
     /**
-     * 题目3：
+     * @param databaseConnection
+     * @return 题目3：
      * 查询所有的商品及其销售额，按照销售额从大到小排序
      */
 // 预期的结果应该如图所示
@@ -194,7 +201,8 @@ public class Sql {
     }
 
     /**
-     * 题目4：
+     * @param databaseConnection
+     * @return 题目4：
      * 查询订单信息，只查询用户名、商品名齐全的订单，即INNER JOIN方式
      */
 // 预期的结果为：
