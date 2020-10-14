@@ -115,7 +115,10 @@ public class Sql {
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
 
         List<User> users = new ArrayList<>();
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select id, name, tel, address from USER limit ?,?;")) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select id, name, tel, address\n" +
+                "from USER\n" +
+                "order by ID desc\n" +
+                "limit ? offset ?;")) {
             preparedStatement.setInt(1, (pageNum - 1) * pageSize);
             preparedStatement.setInt(2, pageSize);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -162,7 +165,30 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        return null;
+        /*
+        select GOODS.ID, GOODS.NAME,SUM("ORDER".GOODS_NUM*"ORDER".GOODS_PRICE) as gmv
+        from "ORDER"
+                 join GOODS on "ORDER".GOODS_ID = GOODS.ID
+        group by GOODS_ID
+        order by gmv desc
+
+*/
+        List<GoodsAndGmv> goodsAndGmvList = new ArrayList<>();
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID, GOODS.NAME,SUM(\"ORDER\".GOODS_NUM*\"ORDER\".GOODS_PRICE) as gmv\n" +
+                "        from \"ORDER\"\n" +
+                "                 join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n" +
+                "        group by GOODS_ID\n" +
+                "        order by gmv desc")) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
+                goodsAndGmv.goodsId = resultSet.getInt(1);
+                goodsAndGmv.goodsName = resultSet.getString(2);
+                goodsAndGmv.gmv = resultSet.getBigDecimal(3);
+                goodsAndGmvList.add(goodsAndGmv);
+            }
+        }
+        return goodsAndGmvList;
     }
 
 
@@ -200,7 +226,14 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+        List<Order> orderList = new ArrayList<>();
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\n" +
+                "from \"ORDER\"\n" +
+                "         join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n" +
+                "         join USER U on U.ID = \"ORDER\".USER_ID\n")) {
+            ResultSet resultSet = statement.executeQuery();
+            return getOrderList(resultSet);
+        }
     }
 
     /**
@@ -228,7 +261,30 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\n" +
+                "from \"ORDER\"\n" +
+                "\n" +
+                "        left join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n" +
+                "\n" +
+                "        left join USER U on U.ID = \"ORDER\".USER_ID;")) {
+            ResultSet resultSet = statement.executeQuery();
+            return getOrderList(resultSet);
+        }
+    }
+
+    public static List<Order> getOrderList(ResultSet resultSet) throws SQLException {
+        List<Order> orderList = new ArrayList<>();
+        while (resultSet.next()) {
+            Order order = new Order();
+            order.id = resultSet.getInt(1);
+            order.userName = resultSet.getString(2);
+            order.goodsName = resultSet.getString(3);
+            order.totalPrice = resultSet.getBigDecimal(4);
+            orderList.add(order);
+
+        }
+        return orderList;
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
