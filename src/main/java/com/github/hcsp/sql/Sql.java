@@ -1,11 +1,15 @@
 
 package com.github.hcsp.sql;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Sql {
 // 用户表：
@@ -82,6 +86,15 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select count(distinct USER_ID)\n" +
+                "from \"ORDER\"\n" +
+                "where GOODS_ID=?;")) {
+            preparedStatement.setInt(1, goodsId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
         return 0;
     }
 
@@ -89,7 +102,7 @@ public class Sql {
      * 题目2：
      * 分页查询所有用户，按照ID倒序排列
      *
-     * @param pageNum 第几页，从1开始
+     * @param pageNum  第几页，从1开始
      * @param pageSize 每页有多少个元素
      * @return 指定页中的用户
      */
@@ -100,7 +113,24 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        return null;
+
+        List<User> users = new ArrayList<>();
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select id, name, tel, address from USER limit ?,?;")) {
+            preparedStatement.setInt(1, (pageNum - 1) * pageSize);
+            preparedStatement.setInt(2, pageSize);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                User user = new User();
+                user.id = resultSet.getInt(1);
+                user.name = resultSet.getString(2);
+                user.tel = resultSet.getString(3);
+                user.address = resultSet.getString(4);
+                users.add(user);
+            }
+
+        }
+
+        return users;
     }
 
     // 商品及其营收
