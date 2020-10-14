@@ -86,9 +86,7 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select count(distinct USER_ID)\n" +
-                "from \"ORDER\"\n" +
-                "where GOODS_ID=?;")) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select count(distinct USER_ID)\nfrom \"ORDER\"\nwhere GOODS_ID=?;")) {
             preparedStatement.setInt(1, goodsId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -115,10 +113,7 @@ public class Sql {
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
 
         List<User> users = new ArrayList<>();
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select id, name, tel, address\n" +
-                "from USER\n" +
-                "order by ID desc\n" +
-                "limit ? offset ?;")) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select id, name, tel, address\nfrom USER\norder by ID desc\nlimit ? offset ?;")) {
             preparedStatement.setInt(1, (pageNum - 1) * pageSize);
             preparedStatement.setInt(2, pageSize);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -165,20 +160,8 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        /*
-        select GOODS.ID, GOODS.NAME,SUM("ORDER".GOODS_NUM*"ORDER".GOODS_PRICE) as gmv
-        from "ORDER"
-                 join GOODS on "ORDER".GOODS_ID = GOODS.ID
-        group by GOODS_ID
-        order by gmv desc
-
-*/
         List<GoodsAndGmv> goodsAndGmvList = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID, GOODS.NAME,SUM(\"ORDER\".GOODS_NUM*\"ORDER\".GOODS_PRICE) as gmv\n" +
-                "        from \"ORDER\"\n" +
-                "                 join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n" +
-                "        group by GOODS_ID\n" +
-                "        order by gmv desc")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID, GOODS.NAME,SUM(\"ORDER\".GOODS_NUM*\"ORDER\".GOODS_PRICE) as gmv\n        from \"ORDER\"\n                 join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n        group by GOODS_ID\n        order by gmv desc")) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
@@ -226,11 +209,7 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        List<Order> orderList = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\n" +
-                "from \"ORDER\"\n" +
-                "         join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n" +
-                "         join USER U on U.ID = \"ORDER\".USER_ID\n")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\nfrom \"ORDER\"\n         join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n         join USER U on U.ID = \"ORDER\".USER_ID\n")) {
             ResultSet resultSet = statement.executeQuery();
             return getOrderList(resultSet);
         }
@@ -262,12 +241,7 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
 
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\n" +
-                "from \"ORDER\"\n" +
-                "\n" +
-                "        left join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n" +
-                "\n" +
-                "        left join USER U on U.ID = \"ORDER\".USER_ID;")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\nfrom \"ORDER\"\n\n        left join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n\n        left join USER U on U.ID = \"ORDER\".USER_ID;")) {
             ResultSet resultSet = statement.executeQuery();
             return getOrderList(resultSet);
         }
