@@ -116,10 +116,10 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         List<User> users = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select id, NAME, TEL, ADDRESS\n" +
-                "from USER\n" +
-                "order by ID desc\n" +
-                "limit ?,?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select id, NAME, TEL, ADDRESS\n"
+                + "from USER\n"
+                + "order by ID desc\n"
+                + "limit ?,?")) {
 
             statement.setInt(1, (pageNum - 1) * pageSize);
             statement.setInt(2, pageSize);
@@ -170,12 +170,12 @@ public class Sql {
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
         List<GoodsAndGmv> goodsAndGmvs = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select g.ID as ID,g.NAME as NAME,sum(o.GOODS_NUM * o.GOODS_PRICE) as GMV\n" +
-                "from GOODS g\n" +
-                "join \"ORDER\" o\n" +
-                "on g.ID = o.GOODS_ID\n" +
-                "group by g.id\n" +
-                "order by GMV desc")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select g.ID as ID,g.NAME as NAME,sum(o.GOODS_NUM * o.GOODS_PRICE) as GMV\n"
+                + "from GOODS g\n"
+                + "join \"ORDER\" o\n"
+                + "on g.ID = o.GOODS_ID\n"
+                + "group by g.id\n"
+                + "order by GMV desc")) {
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -228,12 +228,12 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> orders = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select o.ID as ORDER_ID, u.NAME as USER_NAME, g.NAME as GOODS_NAME,o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE\n" +
-                "from \"ORDER\" o\n" +
-                "         join USER u\n" +
-                "              on o.USER_ID = u.ID\n" +
-                "         join GOODS g\n" +
-                "              on o.GOODS_ID = g.ID")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select o.ID as ORDER_ID, u.NAME as USER_NAME, g.NAME as GOODS_NAME,o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE\n"
+                + "from \"ORDER\" o\n"
+                + "         join USER u\n"
+                + "              on o.USER_ID = u.ID\n"
+                + "         join GOODS g\n"
+                + "              on o.GOODS_ID = g.ID")) {
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -278,12 +278,12 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> orders = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select o.ID as ORDER_ID, u.NAME as USER_NAME, g.NAME as GOODS_NAME,o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE\n" +
-                "from \"ORDER\" o\n" +
-                "         left join USER u\n" +
-                "              on o.USER_ID = u.ID\n" +
-                "         left join GOODS g\n" +
-                "              on o.GOODS_ID = g.ID\n")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select o.ID as ORDER_ID, u.NAME as USER_NAME, g.NAME as GOODS_NAME,o.GOODS_NUM * o.GOODS_PRICE as TOTAL_PRICE\n"
+                + "from \"ORDER\" o\n"
+                + "         left join USER u\n"
+                + "              on o.USER_ID = u.ID\n"
+                + "         left join GOODS g\n"
+                + "              on o.GOODS_ID = g.ID\n")) {
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
