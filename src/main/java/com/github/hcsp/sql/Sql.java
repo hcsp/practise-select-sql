@@ -93,7 +93,7 @@ public class Sql {
                 return resultSet.getInt(1);
             }
         }
-        return 0;
+        return -1;
     }
 
     /**
@@ -158,14 +158,14 @@ public class Sql {
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
         List<GoodsAndGmv> list = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID,\n" +
-                "       GOODS.name,\n" +
-                "       sum(`ORDER`.GOODS_NUM * `ORDER`.GOODS_PRICE) as GMV\n" +
-                "from GOODS\n" +
-                "         join `ORDER`\n" +
-                "              on \"ORDER\".GOODS_ID = GOODS.ID\n" +
-                "group by GOODS_ID\n" +
-                "order by GMV desc")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID,\n"
+                + "       GOODS.name,\n"
+                + "       sum(`ORDER`.GOODS_NUM * `ORDER`.GOODS_PRICE) as GMV\n"
+                + "from GOODS\n"
+                + "         join `ORDER`\n"
+                + "              on \"ORDER\".GOODS_ID = GOODS.ID\n"
+                + "group by GOODS_ID\n"
+                + "order by GMV desc")) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 GoodsAndGmv obj = new GoodsAndGmv();
@@ -214,13 +214,14 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> list = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID                              as ORDERED_ID,\n" +
-                "       U.NAME                                  as USER_NAME,\n" +
-                "       G2.NAME                                 as GOODS_NAME,\n" +
-                "       `ORDER`.GOODS_PRICE * `ORDER`.GOODS_NUM as TOTAL_PRICE\n" +
-                "from \"ORDER\"\n" +
-                "         join USER U on \"ORDER\".USER_ID = U.ID\n" +
-                "         join GOODS G2 on \"ORDER\".GOODS_ID = G2.ID")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement(
+                "select \"ORDER\".ID                              as ORDERED_ID,\n"
+                + "       U.NAME                                  as USER_NAME,\n"
+                + "       G2.NAME                                 as GOODS_NAME,\n"
+                + "       `ORDER`.GOODS_PRICE * `ORDER`.GOODS_NUM as TOTAL_PRICE\n"
+                + "from \"ORDER\"\n"
+                + "         join USER U on \"ORDER\".USER_ID = U.ID\n"
+                + "         join GOODS G2 on \"ORDER\".GOODS_ID = G2.ID")) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Order order = new Order();
@@ -260,13 +261,13 @@ public class Sql {
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         List<Order> list = new ArrayList<>();
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID                              as ORDER_ID,\n" +
-                "       U.NAME                                  as USER_NAME,\n" +
-                "       G2.NAME                                 as GOODS_NAME,\n" +
-                "       \"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE as TOTAL_PRICE\n" +
-                "from \"ORDER\"\n" +
-                "         left join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n" +
-                "         left join USER U on \"ORDER\".USER_ID = U.ID")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".ID                              as ORDER_ID,\n"
+                + "       U.NAME                                  as USER_NAME,\n"
+                + "       G2.NAME                                 as GOODS_NAME,\n"
+                + "       \"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE as TOTAL_PRICE\n"
+                + "from \"ORDER\"\n"
+                + "         left join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID\n"
+                + "         left join USER U on \"ORDER\".USER_ID = U.ID")) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Order order = new Order();
