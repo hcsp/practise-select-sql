@@ -111,7 +111,7 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from `USER` order by ID desc limit ?,?;")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select ID,NAME,TEL,ADDRESS from `USER` order by ID desc limit ?,?;")) {
             statement.setInt(1, (pageNum - 1) * pageSize);
             statement.setInt(2, pageSize);
             ResultSet resultSet = statement.executeQuery();
@@ -216,12 +216,12 @@ public class Sql {
         List<Order> list = new ArrayList<>();
         try (PreparedStatement statement = databaseConnection.prepareStatement(
                 "select \"ORDER\".ID                              as ORDERED_ID,\n"
-                + "       U.NAME                                  as USER_NAME,\n"
-                + "       G2.NAME                                 as GOODS_NAME,\n"
-                + "       `ORDER`.GOODS_PRICE * `ORDER`.GOODS_NUM as TOTAL_PRICE\n"
-                + "from \"ORDER\"\n"
-                + "         join USER U on \"ORDER\".USER_ID = U.ID\n"
-                + "         join GOODS G2 on \"ORDER\".GOODS_ID = G2.ID")) {
+                        + "       U.NAME                                  as USER_NAME,\n"
+                        + "       G2.NAME                                 as GOODS_NAME,\n"
+                        + "       `ORDER`.GOODS_PRICE * `ORDER`.GOODS_NUM as TOTAL_PRICE\n"
+                        + "from \"ORDER\"\n"
+                        + "         join USER U on \"ORDER\".USER_ID = U.ID\n"
+                        + "         join GOODS G2 on \"ORDER\".GOODS_ID = G2.ID")) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Order order = new Order();
