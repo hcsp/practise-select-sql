@@ -1,11 +1,17 @@
 
 package com.github.hcsp.sql;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.h2.util.ParserUtil.ORDER;
 
 public class Sql {
 // 用户表：
@@ -62,6 +68,13 @@ public class Sql {
         String tel;
         String address;
 
+        public User(Integer id, String name, String tel, String address) {
+            this.id = id;
+            this.name = name;
+            this.tel = tel;
+            this.address = address;
+        }
+
         @Override
         public String toString() {
             return "User{" + "id=" + id + ", name='" + name + '\'' + ", tel='" + tel + '\'' + ", address='" + address + '\'' + '}';
@@ -82,14 +95,22 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        return 0;
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(distinct USER_ID) from `ORDER` where goods_ID = ?;")) {
+            statement.setInt(1, goodsId);
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return -1;
     }
 
     /**
      * 题目2：
      * 分页查询所有用户，按照ID倒序排列
      *
-     * @param pageNum 第几页，从1开始
+     * @param pageNum  第几页，从1开始
      * @param pageSize 每页有多少个元素
      * @return 指定页中的用户
      */
@@ -100,7 +121,20 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        return null;
+        List<User> resultList = new ArrayList<>();
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select id, name, tel, address from USER order by ID DESC limit ? offset ?")) {
+            preparedStatement.setInt(1, pageSize);
+            preparedStatement.setInt(2, (pageNum - 1) * pageSize);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                String tel = resultSet.getString(3);
+                String address = resultSet.getString(4);
+                resultList.add(new User(id, name, tel, address));
+            }
+        }
+        return resultList.size() > 0 ? resultList : null;
     }
 
     // 商品及其营收
@@ -108,6 +142,12 @@ public class Sql {
         Integer goodsId; // 商品ID
         String goodsName; // 商品名
         BigDecimal gmv; // 商品的所有销售额
+
+        public GoodsAndGmv(Integer goodsId, String goodsName, BigDecimal gmv) {
+            this.goodsId = goodsId;
+            this.goodsName = goodsName;
+            this.gmv = gmv;
+        }
 
         @Override
         public String toString() {
@@ -132,7 +172,22 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        return null;
+        List<GoodsAndGmv> resultList = new ArrayList<>();
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select goods.id, name, cast(sum(GOODS_PRICE * GOODS_NUM * 100 / 100) as Decimal(9, 0)) as GMV\n" +
+                "from GOODS\n" +
+                "    join `ORDER`\n" +
+                "on goods.id = `ORDER`.GOODS_ID\n" +
+                "group by goods.id\n" +
+                "order by GMV desc")) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                BigDecimal GMV = resultSet.getBigDecimal(3);
+                resultList.add(new GoodsAndGmv(id, name, GMV));
+            }
+        }
+        return resultList.size() > 0 ? resultList : null;
     }
 
 
@@ -142,6 +197,7 @@ public class Sql {
         String userName; // 用户名
         String goodsName; // 商品名
         BigDecimal totalPrice; // 订单总金额
+
 
         @Override
         public String toString() {
@@ -170,7 +226,26 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id                                                       as ORDER_ID,\n" +
+                "       user.name                                                        as USER_NAME,\n" +
+                "       GOODS.NAME                                                       as GOODS_NAME,\n" +
+                "       cast((\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as decimal(9, 0)) as TOTAL_PRICE\n" +
+                "from \"ORDER\"\n" +
+                "         inner join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n" +
+                "         inner join USER on \"ORDER\".USER_ID = USER.ID")) {
+            ResultSet resultSet = statement.executeQuery();
+
+            List<Order> orders = new ArrayList<>();
+            while (resultSet.next()) {
+                Order order = new Order();
+                order.id = resultSet.getInt(1);
+                order.userName = resultSet.getString(2);
+                order.goodsName = resultSet.getString(3);
+                order.totalPrice = resultSet.getBigDecimal(4);
+                orders.add(order);
+            }
+            return orders;
+        }
     }
 
     /**
@@ -198,7 +273,26 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id                                as ORDER_ID,\n" +
+                "       user.name                                 as USER_NAME,\n" +
+                "       GOODS.NAME                                as GOODS_NAME,\n" +
+                "       (\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as TOTAL_PRICE\n" +
+                "from \"ORDER\"\n" +
+                "         left join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n" +
+                "         left join USER on \"ORDER\".USER_ID = USER.ID;")) {
+            ResultSet resultSet = statement.executeQuery();
+
+            List<Order> orders = new ArrayList<>();
+            while (resultSet.next()) {
+                Order order = new Order();
+                order.id = resultSet.getInt(1);
+                order.userName = resultSet.getString(2);
+                order.goodsName = resultSet.getString(3);
+                order.totalPrice = resultSet.getBigDecimal(4);
+                orders.add(order);
+            }
+            return orders;
+        }
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
