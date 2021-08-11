@@ -173,12 +173,7 @@ public class Sql {
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
         List<GoodsAndGmv> resultList = new ArrayList<>();
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select goods.id, name, cast(sum(GOODS_PRICE * GOODS_NUM * 100 / 100) as Decimal(9, 0)) as GMV\n" +
-                "from GOODS\n" +
-                "    join `ORDER`\n" +
-                "on goods.id = `ORDER`.GOODS_ID\n" +
-                "group by goods.id\n" +
-                "order by GMV desc")) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select goods.id, name, cast(sum(GOODS_PRICE * GOODS_NUM * 100 / 100) as Decimal(9, 0)) as GMV from GOODS join `ORDER` on goods.id = `ORDER`.GOODS_ID group by goods.id order by GMV desc")) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Integer id = resultSet.getInt(1);
@@ -226,13 +221,7 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id                                                       as ORDER_ID,\n" +
-                "       user.name                                                        as USER_NAME,\n" +
-                "       GOODS.NAME                                                       as GOODS_NAME,\n" +
-                "       cast((\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as decimal(9, 0)) as TOTAL_PRICE\n" +
-                "from \"ORDER\"\n" +
-                "         inner join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n" +
-                "         inner join USER on \"ORDER\".USER_ID = USER.ID")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id as ORDER_ID,name as USER_NAME,GOODS.NAME as GOODS_NAME,cast((\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as decimal(9, 0)) as TOTAL_PRICE from \"ORDER\" inner join GOODS on \"ORDER\".GOODS_ID = GOODS.ID inner join USER on \"ORDER\".USER_ID = USER.ID")) {
             ResultSet resultSet = statement.executeQuery();
 
             List<Order> orders = new ArrayList<>();
@@ -273,13 +262,7 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id                                as ORDER_ID,\n" +
-                "       user.name                                 as USER_NAME,\n" +
-                "       GOODS.NAME                                as GOODS_NAME,\n" +
-                "       (\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as TOTAL_PRICE\n" +
-                "from \"ORDER\"\n" +
-                "         left join GOODS on \"ORDER\".GOODS_ID = GOODS.ID\n" +
-                "         left join USER on \"ORDER\".USER_ID = USER.ID;")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id as ORDER_ID,name as USER_NAME,GOODS.NAME as GOODS_NAME,cast((\"ORDER\".GOODS_NUM * \"ORDER\".GOODS_PRICE) as decimal(9, 0)) as TOTAL_PRICE from \"ORDER\" left join GOODS on \"ORDER\".GOODS_ID = GOODS.ID left join \"ORDER\" O on GOODS.ID = O.GOODS_ID join USER on \"ORDER\".USER_ID = USER.ID")) {
             ResultSet resultSet = statement.executeQuery();
 
             List<Order> orders = new ArrayList<>();
