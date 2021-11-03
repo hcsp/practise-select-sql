@@ -1,10 +1,10 @@
 
 package com.github.hcsp.sql;
+
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sql {
@@ -82,14 +82,24 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        return 0;
+        Integer result;
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select count(distinct user_id) as count from `order` where goods_id = ?")) {
+            preparedStatement.setInt(1, goodsId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                result = null;
+                if (resultSet.next()) {
+                    result = Integer.parseInt(resultSet.getString("count"));
+                }
+            }
+        }
+        return result;
     }
 
     /**
      * 题目2：
      * 分页查询所有用户，按照ID倒序排列
      *
-     * @param pageNum 第几页，从1开始
+     * @param pageNum  第几页，从1开始
      * @param pageSize 每页有多少个元素
      * @return 指定页中的用户
      */
@@ -100,7 +110,23 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        return null;
+        ArrayList<User> users;
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select * from user order by id desc limit ?,?")) {
+            preparedStatement.setInt(1, (pageNum - 1) * pageSize);
+            preparedStatement.setInt(2, pageSize);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                users = new ArrayList<>();
+                while (resultSet.next()) {
+                    User user = new User();
+                    user.id = resultSet.getInt("id");
+                    user.name = resultSet.getString("name");
+                    user.tel = resultSet.getString("tel");
+                    user.address = resultSet.getString("address");
+                    users.add(user);
+                }
+            }
+        }
+        return users;
     }
 
     // 商品及其营收
@@ -132,7 +158,21 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-        return null;
+        ArrayList<GoodsAndGmv> goodsAndGmvs;
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select g.id, g.name,O.GOODS_PRICE * sum(O.GOODS_NUM) as GVM\n" +
+                "from GOODS g join \"ORDER\" O on g.ID = O.GOODS_ID group by g.NAME order by GVM desc;")) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                goodsAndGmvs = new ArrayList<>();
+                while (resultSet.next()) {
+                    GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
+                    goodsAndGmv.goodsId = resultSet.getInt("id");
+                    goodsAndGmv.goodsName = resultSet.getString("name");
+                    goodsAndGmv.gmv = resultSet.getBigDecimal("gvm");
+                    goodsAndGmvs.add(goodsAndGmv);
+                }
+            }
+        }
+        return goodsAndGmvs;
     }
 
 
@@ -170,7 +210,25 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+        ArrayList<Order> orders;
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select O.ID, U.name as username, G.NAME as goodsName, O.GOODS_PRICE * O.GOODS_NUM as TOTAL_PRICE\n" +
+                "from \"ORDER\" O\n" +
+                "         join GOODS G on G.ID = O.GOODS_ID\n" +
+                "         join USER U on U.ID = O.USER_ID;")) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                orders = new ArrayList<>();
+                while (resultSet.next()) {
+                    Order order = new Order();
+                    order.id = resultSet.getInt("id");
+                    order.userName = resultSet.getString("username");
+                    order.goodsName = resultSet.getString("goodsname");
+                    order.totalPrice = resultSet.getBigDecimal("total_price");
+                    orders.add(order);
+
+                }
+            }
+        }
+        return orders;
     }
 
     /**
@@ -198,7 +256,24 @@ public class Sql {
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
-        return null;
+        ArrayList<Order> orders;
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select O.ID as order_id, U.NAME as user_name, G.NAME as goods_name, O.GOODS_NUM * O.GOODS_PRICE as total_price\n" +
+                "from \"ORDER\" O\n" +
+                "         left join GOODS G on G.ID = O.GOODS_ID\n" +
+                "         left join USER U on U.ID = O.USER_ID;")) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                orders = new ArrayList<>();
+                while (resultSet.next()) {
+                    Order order = new Order();
+                    order.id = resultSet.getInt("order_id");
+                    order.userName = resultSet.getString("user_name");
+                    order.goodsName = resultSet.getString("goods_name");
+                    order.totalPrice = resultSet.getBigDecimal("total_price");
+                    orders.add(order);
+                }
+            }
+        }
+        return orders;
     }
 
     // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库
