@@ -1,5 +1,6 @@
 
 package com.github.hcsp.sql;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -82,7 +83,7 @@ public class Sql {
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
         PreparedStatement statement = databaseConnection.prepareStatement("select count(distinct user_id) from `order` where goods_id = ?");
-        statement.setInt(1,goodsId);
+        statement.setInt(1, goodsId);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             return resultSet.getInt(1);
@@ -94,7 +95,7 @@ public class Sql {
      * 题目2：
      * 分页查询所有用户，按照ID倒序排列
      *
-     * @param pageNum 第几页，从1开始
+     * @param pageNum  第几页，从1开始
      * @param pageSize 每页有多少个元素
      * @return 指定页中的用户
      */
@@ -106,8 +107,8 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
         PreparedStatement statement = databaseConnection.prepareStatement("select id, name, tel ,address from `user`  ORDER BY ID DESC limit ?,?");
-        statement.setInt(1,pageSize * (pageNum - 1));//2 2,2
-        statement.setInt(2,pageSize);//2
+        statement.setInt(1, pageSize * (pageNum - 1));//2 2,2
+        statement.setInt(2, pageSize);//2
         ResultSet resultSet = statement.executeQuery();
 
         List<User> list = new ArrayList<>();
@@ -156,7 +157,7 @@ public class Sql {
         List<GoodsAndGmv> list = new ArrayList<>();
         while (resultSet.next()) {
             GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
-            goodsAndGmv.goodsId= resultSet.getInt(1);
+            goodsAndGmv.goodsId = resultSet.getInt(1);
             goodsAndGmv.goodsName = resultSet.getString(2);
             goodsAndGmv.gmv = resultSet.getBigDecimal(3);
             list.add(goodsAndGmv);
@@ -205,7 +206,7 @@ public class Sql {
         while (resultSet.next()) {
             Order order = new Order();
             order.id = resultSet.getInt(1);
-            order.userName= resultSet.getString(2);
+            order.userName = resultSet.getString(2);
             order.goodsName = resultSet.getString(3);
             order.totalPrice = resultSet.getBigDecimal(4);
             list.add(order);
@@ -244,7 +245,7 @@ public class Sql {
         while (resultSet.next()) {
             Order order = new Order();
             order.id = resultSet.getInt(1);
-            order.userName= resultSet.getString(2);
+            order.userName = resultSet.getString(2);
             order.goodsName = resultSet.getString(3);
             order.totalPrice = resultSet.getBigDecimal(4);
             list.add(order);
