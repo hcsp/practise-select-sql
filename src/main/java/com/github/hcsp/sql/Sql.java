@@ -86,14 +86,14 @@ public class Sql {
 // | 2   |
 // +-----+
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select count(distinct USER_ID) from `ORDER` where GOODS_ID = ?")) {
-            statement.setInt(1, goodsId);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select count(distinct USER_ID) as total from `ORDER` where GOODS_ID = ?")) {
+            preparedStatement.setInt(1, goodsId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
                 return resultSet.getInt(1);
             }
+            return 0;
         }
-        return -1;
     }
 
     /**
