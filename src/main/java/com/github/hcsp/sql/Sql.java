@@ -112,20 +112,21 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
 
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from USER order by ID desc limit ?, ?")) {
-            statement.setInt(1, pageNum);
-            statement.setInt(2, (pageNum - 1) * pageSize);
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select ID, NAME, TEL, ADDRESS from "
+                + "USER order by ID desc LIMIT ? offset ? ;")) {
+            statement.setInt(1, (pageNum - 1) * pageSize);
+            statement.setInt(2, pageSize);
             ResultSet resultSet = statement.executeQuery();
-            List<User> userList = new ArrayList<>();
+            List<User> users = new ArrayList<>();
             while (resultSet.next()) {
                 User user = new User();
                 user.id = resultSet.getInt(1);
                 user.name = resultSet.getString(2);
                 user.tel = resultSet.getString(3);
                 user.address = resultSet.getString(4);
-                userList.add(user);
+                users.add(user);
             }
-            return userList;
+            return users;
         }
 
     }
