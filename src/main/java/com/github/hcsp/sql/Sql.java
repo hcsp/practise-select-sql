@@ -161,11 +161,13 @@ public class Sql {
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
 
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID, NAME, sum(GOODS_NUM * GOODS_PRICE) as GMV from GOODS\n"
-                + "join \"ORDER\" O on GOODS.ID = O.GOODS_ID\n"
-                + "group by GOODS.ID\n"
-                + "order by GMV desc")) {
-            ResultSet resultSet = statement.executeQuery();
+        String sql = "SELECT GOODS.ID, GOODS.NAME, sum(\"ORDER\".GOODS_NUM *\"ORDER\".GOODS_PRICE) AS GMV  FROM GOODS\n"
+                + "JOIN \"ORDER\"\n"
+                + "ON GOODS.ID = \"ORDER\".GOODS_ID\n"
+                + "GROUP BY GOODS.ID\n"
+                + "ORDER BY GMV DESC";
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
             List<GoodsAndGmv> goodsAndGmvList = new ArrayList<>();
             while (resultSet.next()) {
                 GoodsAndGmv goodsAndGmv = new GoodsAndGmv();
@@ -173,11 +175,10 @@ public class Sql {
                 goodsAndGmv.goodsName = resultSet.getString(2);
                 goodsAndGmv.gmv = resultSet.getBigDecimal(3);
                 goodsAndGmvList.add(goodsAndGmv);
-
             }
             return goodsAndGmvList;
-
         }
+
 
 
     }
