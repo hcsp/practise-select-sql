@@ -112,7 +112,7 @@ public class Sql {
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
 
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from USER order by ID desc limit ? offset ?")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select * from USER order by ID desc limit ?, ?")) {
             statement.setInt(1, pageNum);
             statement.setInt(2, (pageNum - 1) * pageSize);
             ResultSet resultSet = statement.executeQuery();
@@ -161,9 +161,9 @@ public class Sql {
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
 
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS_ID , GOODS.NAME,SUM(GOODS_NUM * GOODS_PRICE)as GMV from `ORDER`\n"
-                + "join GOODS on `ORDER`.GOODS_ID = GOODS.ID\n"
-                + "group by GOODS_ID\n"
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select GOODS.ID, NAME, sum(GOODS_NUM * GOODS_PRICE) as GMV from GOODS\n"
+                + "join \"ORDER\" O on GOODS.ID = O.GOODS_ID\n"
+                + "group by GOODS.ID\n"
                 + "order by GMV desc")) {
             ResultSet resultSet = statement.executeQuery();
             List<GoodsAndGmv> goodsAndGmvList = new ArrayList<>();
