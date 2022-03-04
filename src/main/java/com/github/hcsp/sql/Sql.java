@@ -104,7 +104,7 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        PreparedStatement statement = databaseConnection.prepareStatement("select * from `user` limit ? offset ?");
+        PreparedStatement statement = databaseConnection.prepareStatement("select * from `user` order by `id` desc limit ? offset ?");
         statement.setInt(1, pageSize);
         statement.setInt(2, (pageNum - 1) * pageSize);
         ResultSet resultSet = statement.executeQuery();
