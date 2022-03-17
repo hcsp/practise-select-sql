@@ -251,6 +251,7 @@ public class Sql {
             order.userName = resultSet.getString(2);
             order.goodsName = resultSet.getString(3);
             order.totalPrice = resultSet.getBigDecimal(4);
+            list.add(order);
         }
         return list;
     }
@@ -300,6 +301,7 @@ public class Sql {
             order.userName = resultSet.getString(2);
             order.goodsName = resultSet.getString(3);
             order.totalPrice = resultSet.getBigDecimal(4);
+            list.add(order);
         }
         return list;
     }
