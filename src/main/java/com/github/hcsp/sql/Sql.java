@@ -174,7 +174,7 @@ public class Sql {
 
     /**
      * @param databaseConnection 连接对象
-     * @return
+     * @return 商品销售额数组
      * @throws SQLException
      */
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
@@ -232,7 +232,7 @@ public class Sql {
 
     /**
      * @param databaseConnection 连接对象
-     * @return
+     * @return 用户商品齐全的订单数组
      * @throws SQLException
      */
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
@@ -282,7 +282,7 @@ public class Sql {
 
     /**
      * @param databaseConnection 连接对象
-     * @return
+     * @return 所有的订单信息数组
      * @throws SQLException
      */
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
