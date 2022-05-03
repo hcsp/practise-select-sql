@@ -86,7 +86,7 @@ public class Sql {
      * countUsersWhoHaveBoughtGoods
      * @param databaseConnection
      * @param goodsId
-     * @return
+     * @return int
      * @throws SQLException
      */
     public static int countUsersWhoHaveBoughtGoods(Connection databaseConnection, Integer goodsId) throws SQLException {
@@ -121,7 +121,7 @@ public class Sql {
      * @param databaseConnection
      * @param pageNum
      * @param pageSize
-     * @return
+     * @return List<User>
      * @throws SQLException
      */
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
@@ -181,7 +181,7 @@ public class Sql {
     /**
      * getGoodsAndGmv
      * @param databaseConnection
-     * @return
+     * @return List<GoodsAndGmv>
      * @throws SQLException
      */
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
@@ -247,7 +247,7 @@ public class Sql {
     /**
      * getInnerJoinOrders
      * @param databaseConnection
-     * @return
+     * @return List<Order>
      * @throws SQLException
      */
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
@@ -304,6 +304,13 @@ public class Sql {
 // +----------+-----------+------------+-------------+
 // | 8        | NULL      | NULL       | 60          |
 // +----------+-----------+------------+-------------+
+
+    /**
+     * getLeftJoinOrders
+     * @param databaseConnection
+     * @return List<Order>
+     * @throws SQLException
+     */
     public static List<Order> getLeftJoinOrders(Connection databaseConnection) throws SQLException {
         PreparedStatement preparedStatement = null;
         try {
