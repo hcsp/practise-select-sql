@@ -139,12 +139,12 @@ public class Sql {
 // | 1  | zhangsan | tel1 | beijing  |
 // +----+----------+------+----------+
     public static List<User> getUsersByPageOrderedByIdDesc(Connection databaseConnection, int pageNum, int pageSize) throws SQLException {
-        try(PreparedStatement preparedStatement = databaseConnection.prepareStatement("select ID, NAME, TEL, ADDRESS from USER order by ID desc limit ?, ?")) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement("select ID, NAME, TEL, ADDRESS from USER order by ID desc limit ?, ?")) {
             preparedStatement.setInt(1, (pageNum - 1) * pageSize);
             preparedStatement.setInt(2, pageSize);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<User> users = new ArrayList<>();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 User user = new User();
                 user.id = resultSet.getInt(1);
                 user.name = resultSet.getString(2);
@@ -185,18 +185,18 @@ public class Sql {
 //  | 3  | goods3 | 20   |
 //  +----+--------+------+
     public static List<GoodsAndGmv> getGoodsAndGmv(Connection databaseConnection) throws SQLException {
-     //select  GOODS_ID, G2.NAME, SUM(GOODS_NUM * GOODS_PRICE) as ORDER_SALE from "ORDER" JOIN GOODS G2 on G2.ID = "ORDER".GOODS_ID group by GOODS_ID;
-        try(PreparedStatement statement = databaseConnection.prepareStatement("select  GOODS_ID, G2.NAME, SUM(GOODS_NUM * GOODS_PRICE) as ORDER_SALE from \"ORDER\" JOIN GOODS G2 on G2.ID = \"ORDER\".GOODS_ID group by GOODS_ID order by ORDER_SALE desc")){
+        //select  GOODS_ID, G2.NAME, SUM(GOODS_NUM * GOODS_PRICE) as ORDER_SALE from "ORDER" JOIN GOODS G2 on G2.ID = "ORDER".GOODS_ID group by GOODS_ID;
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select  GOODS_ID, G2.NAME, SUM(GOODS_NUM * GOODS_PRICE) as ORDER_SALE from \"ORDER\" JOIN GOODS G2 on G2.ID = \"ORDER\".GOODS_ID group by GOODS_ID order by ORDER_SALE desc")) {
             ResultSet resultSet = statement.executeQuery();
             List<GoodsAndGmv> list = new ArrayList<>();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 GoodsAndGmv gmv = new GoodsAndGmv();
                 gmv.goodsId = resultSet.getInt(1);
                 gmv.goodsName = resultSet.getString(2);
                 gmv.gmv = resultSet.getBigDecimal(3);
                 list.add(gmv);
             }
-            return  list;
+            return list;
         }
     }
 
@@ -235,8 +235,7 @@ public class Sql {
 // | 6        | zhangsan  | goods3     | 20          |
 // +----------+-----------+------------+-------------+
     public static List<Order> getInnerJoinOrders(Connection databaseConnection) throws SQLException {
-        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\n" +
-                "from \"ORDER\" join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID join USER U on U.ID = \"ORDER\".USER_ID")) {
+        try (PreparedStatement statement = databaseConnection.prepareStatement("select \"ORDER\".id as ORDER_ID, U.NAME as USER_NAME, G2.NAME as GOODS_NAME, \"ORDER\".GOODS_PRICE * \"ORDER\".GOODS_NUM as TOTAL_PRICE\n" + "from \"ORDER\" join GOODS G2 on G2.ID = \"ORDER\".GOODS_ID join USER U on U.ID = \"ORDER\".USER_ID")) {
             return getOrders(statement);
         }
     }
@@ -244,7 +243,7 @@ public class Sql {
     private static List<Order> getOrders(PreparedStatement statement) throws SQLException {
         ResultSet resultSet = statement.executeQuery();
         List<Order> result = new ArrayList<>();
-        while (resultSet.next()){
+        while (resultSet.next()) {
             Order newOrder = new Order();
             newOrder.id = resultSet.getInt(1);
             newOrder.userName = resultSet.getString(2); // 用户名;
@@ -252,7 +251,7 @@ public class Sql {
             newOrder.totalPrice = resultSet.getBigDecimal(4); // 订单总金额
             result.add(newOrder);
         }
-        return  result;
+        return result;
     }
 
     /**
